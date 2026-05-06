@@ -10,10 +10,11 @@ export interface SiteData {
   data: DayData[];
 }
 
-const PROPERTIES = [
-  { id: "301641883", name: "Verhaalsommen.nl" },
-  { id: "400810268", name: "OefenBegrijpendLezen.nl" },
-  { id: "530166190", name: "MijnTafeldiploma.nl" },
+export const PROPERTIES = [
+  { id: "400810268", name: "OefenBegrijpendLezen" },
+  { id: "301641883", name: "Verhaalsommen" },
+  { id: "530166190", name: "MijnTafeldiploma" },
+  { id: "371057702", name: "MathWordProblems" },
 ];
 
 async function getAccessToken(): Promise<string> {
@@ -50,10 +51,7 @@ export async function getVisitorsLast7Days(): Promise<SiteData[]> {
         }
       );
 
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(`GA4 fout voor ${name}: ${err}`);
-      }
+      if (!res.ok) throw new Error(`GA4 fout voor ${name}: ${await res.text()}`);
 
       const json = await res.json();
       const data: DayData[] = (json.rows ?? []).map(
