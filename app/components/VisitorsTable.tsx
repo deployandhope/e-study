@@ -17,7 +17,7 @@ interface Props {
   subtitle: string;
   sites: SiteData[];
   siteNames: string[];
-  formatValue?: (v: number) => string;
+  format?: "integer" | "decimal";
   aggregation?: "sum" | "avg";
 }
 
@@ -36,9 +36,11 @@ export default function VisitorsTable({
   subtitle,
   sites,
   siteNames,
-  formatValue = (v) => Math.round(v).toLocaleString("nl-NL"),
+  format = "integer",
   aggregation = "sum",
 }: Props) {
+  const formatValue = (v: number) =>
+    format === "decimal" ? v.toFixed(1) : Math.round(v).toLocaleString("nl-NL");
   const [hovRow, setHovRow] = useState<string | null>(null);
   const [hovCol, setHovCol] = useState<string | null>(null);
 

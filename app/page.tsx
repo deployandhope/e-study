@@ -33,7 +33,7 @@ export default async function Page() {
           subtitle="screenPageViewsPerUser per dag"
           sites={views}
           siteNames={siteNames}
-          formatValue={(v) => v.toFixed(1)}
+          format="decimal"
           aggregation="avg"
         />
       </div>
