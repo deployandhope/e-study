@@ -1,10 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { getVisitorsLast7Days, PROPERTIES } from "./lib/ga4";
+import { getMetricLast7Days, PROPERTIES } from "./lib/ga4";
 import VisitorsTable from "./components/VisitorsTable";
 
 export default async function Page() {
-  const sites = await getVisitorsLast7Days();
+  const [users, views] = await Promise.all([
+    getMetricLast7Days("activeUsers"),
+    getMetricLast7Days("screenPageViewsPerUser"),
+  ]);
+
   const siteNames = PROPERTIES.map((p) => p.name);
 
   return (
@@ -14,10 +18,25 @@ export default async function Page() {
           Alle Domeinen
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-          Actieve gebruikers per dag — afgelopen 7 dagen
+          Afgelopen 7 dagen
         </p>
       </div>
-      <VisitorsTable sites={sites} siteNames={siteNames} />
+      <div className="grid grid-cols-2 gap-6">
+        <VisitorsTable
+          title="Actieve gebruikers"
+          subtitle="activeUsers per dag"
+          sites={users}
+          siteNames={siteNames}
+        />
+        <VisitorsTable
+          title="Views per gebruiker"
+          subtitle="screenPageViewsPerUser per dag"
+          sites={views}
+          siteNames={siteNames}
+          formatValue={(v) => v.toFixed(1)}
+          aggregation="avg"
+        />
+      </div>
     </div>
   );
 }

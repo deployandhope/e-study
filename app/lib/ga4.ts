@@ -2,7 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 
 export interface DayData {
   date: string;
-  users: number;
+  value: number;
 }
 
 export interface SiteData {
@@ -28,7 +28,7 @@ async function getAccessToken(): Promise<string> {
   return token;
 }
 
-export async function getVisitorsLast7Days(): Promise<SiteData[]> {
+export async function getMetricLast7Days(metric: string): Promise<SiteData[]> {
   const token = await getAccessToken();
 
   return Promise.all(
@@ -43,7 +43,7 @@ export async function getVisitorsLast7Days(): Promise<SiteData[]> {
           },
           body: JSON.stringify({
             dimensions: [{ name: "date" }],
-            metrics: [{ name: "activeUsers" }],
+            metrics: [{ name: metric }],
             dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
           }),
@@ -57,7 +57,7 @@ export async function getVisitorsLast7Days(): Promise<SiteData[]> {
       const data: DayData[] = (json.rows ?? []).map(
         (row: { dimensionValues: { value: string }[]; metricValues: { value: string }[] }) => ({
           date: row.dimensionValues[0].value,
-          users: parseInt(row.metricValues[0].value ?? "0"),
+          value: parseFloat(row.metricValues[0].value ?? "0"),
         })
       );
 
