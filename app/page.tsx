@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getVisitorsLast7Days } from "./lib/ga4";
 import VisitorsChart from "./components/VisitorsChart";
 
