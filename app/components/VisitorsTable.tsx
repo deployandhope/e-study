@@ -17,7 +17,8 @@ interface Props {
   subtitle: string;
   sites: SiteData[];
   siteNames: string[];
-  format?: "integer" | "decimal";
+  siteShorts?: string[];
+  format?: "integer" | "decimal" | "duration";
   aggregation?: "sum" | "avg";
 }
 
@@ -36,11 +37,19 @@ export default function VisitorsTable({
   subtitle,
   sites,
   siteNames,
+  siteShorts,
   format = "integer",
   aggregation = "sum",
 }: Props) {
-  const formatValue = (v: number) =>
-    format === "decimal" ? v.toFixed(1) : Math.round(v).toLocaleString("nl-NL");
+  const formatValue = (v: number) => {
+    if (format === "decimal") return v.toFixed(1);
+    if (format === "duration") {
+      const m = Math.floor(v / 60);
+      const s = Math.round(v % 60);
+      return `${m}m ${s.toString().padStart(2, "0")}s`;
+    }
+    return Math.round(v).toLocaleString("nl-NL");
+  };
   const [hovRow, setHovRow] = useState<string | null>(null);
   const [hovCol, setHovCol] = useState<string | null>(null);
 
@@ -100,14 +109,15 @@ export default function VisitorsTable({
             <thead className="sticky top-0 z-10" style={{ background: "#f0f4fa", borderBottom: "1px solid var(--border)" }}>
               <tr>
                 <th className="px-3 py-2 font-semibold whitespace-nowrap" style={{ color: "var(--muted)" }}>Dag</th>
-                {siteNames.map((name) => (
+                {siteNames.map((name, i) => (
                   <th
                     key={name}
                     className="px-3 py-2 text-right font-semibold cursor-default"
                     style={{ ...colBase, color: hovCol === name ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === name ? HOVER_BG : undefined }}
                     onMouseEnter={() => setHovCol(name)}
+                    title={name}
                   >
-                    {name}
+                    {siteShorts?.[i] ?? name}
                   </th>
                 ))}
                 <th

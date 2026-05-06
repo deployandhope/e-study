@@ -11,10 +11,10 @@ export interface SiteData {
 }
 
 export const PROPERTIES = [
-  { id: "400810268", name: "OefenBegrijpendLezen" },
-  { id: "301641883", name: "Verhaalsommen" },
-  { id: "530166190", name: "MijnTafeldiploma" },
-  { id: "371057702", name: "MathWordProblems" },
+  { id: "400810268", name: "OefenBegrijpendLezen", short: "OBL" },
+  { id: "301641883", name: "Verhaalsommen", short: "VS" },
+  { id: "530166190", name: "MijnTafeldiploma", short: "MTD" },
+  { id: "371057702", name: "MathWordProblems", short: "MWP" },
 ];
 
 async function getAccessToken(): Promise<string> {
