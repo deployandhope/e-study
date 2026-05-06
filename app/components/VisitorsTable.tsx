@@ -95,7 +95,7 @@ export default function VisitorsTable({
         style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 1px 4px rgba(26,39,68,0.06)" }}
         onMouseLeave={() => { setHovRow(null); setHovCol(null); }}
       >
-        <div className="overflow-auto">
+        <div>
           <table className="w-full text-xs text-left">
             <thead className="sticky top-0 z-10" style={{ background: "#f0f4fa", borderBottom: "1px solid var(--border)" }}>
               <tr>
@@ -103,7 +103,7 @@ export default function VisitorsTable({
                 {siteNames.map((name) => (
                   <th
                     key={name}
-                    className="px-3 py-2 text-right font-semibold whitespace-nowrap cursor-default"
+                    className="px-3 py-2 text-right font-semibold cursor-default"
                     style={{ ...colBase, color: hovCol === name ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === name ? HOVER_BG : undefined }}
                     onMouseEnter={() => setHovCol(name)}
                   >
@@ -111,7 +111,7 @@ export default function VisitorsTable({
                   </th>
                 ))}
                 <th
-                  className="px-3 py-2 text-right font-semibold whitespace-nowrap cursor-default"
+                  className="px-3 py-2 text-right font-semibold cursor-default"
                   style={{ ...totColBase, color: hovCol === "__tot__" ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === "__tot__" ? HOVER_BG : "#eef2f9" }}
                   onMouseEnter={() => setHovCol("__tot__")}
                 >
@@ -137,7 +137,7 @@ export default function VisitorsTable({
                     {siteNames.map((name) => (
                       <td
                         key={name}
-                        className="px-3 py-1 text-right tabular-nums whitespace-nowrap"
+                        className="px-3 py-1 text-right tabular-nums"
                         style={{ ...colBase, ...cellStyle(date, name, colBase) }}
                         onMouseEnter={() => setHovCol(name)}
                       >
@@ -171,7 +171,7 @@ export default function VisitorsTable({
                 {siteNames.map((name) => (
                   <td
                     key={name}
-                    className="px-3 py-1.5 text-right tabular-nums font-semibold whitespace-nowrap"
+                    className="px-3 py-1.5 text-right tabular-nums font-semibold"
                     style={{ ...colBase, ...cellStyle("__tot__", name, colBase) }}
                     onMouseEnter={() => setHovCol(name)}
                   >
