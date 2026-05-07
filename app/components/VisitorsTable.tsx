@@ -22,6 +22,7 @@ interface Props {
   aggregation?: "sum" | "avg";
   maxHeight?: number;
   showTotal?: boolean;
+  conditionalTotal?: boolean;
 }
 
 function formatDate(d: string) {
@@ -44,6 +45,7 @@ export default function VisitorsTable({
   aggregation = "sum",
   maxHeight,
   showTotal = true,
+  conditionalTotal = false,
 }: Props) {
   const formatValue = (v: number) => {
     if (format === "currency") return "€ " + v.toFixed(2).replace(".", ",");
@@ -80,6 +82,22 @@ export default function VisitorsTable({
     ])
   );
   const grandTotal = aggregate(Object.values(siteTotals));
+
+  const rowTotals = allDates.map((date) =>
+    aggregate(siteNames.map((name) => lookup[name]?.[date] ?? 0))
+  );
+  const minTotal = Math.min(...rowTotals);
+  const maxTotal = Math.max(...rowTotals);
+
+  function totalCellBg(value: number): React.CSSProperties {
+    if (!conditionalTotal || maxTotal === minTotal) return {};
+    const ratio = (value - minTotal) / (maxTotal - minTotal);
+    const r = Math.round(255 - ratio * (255 - 22));
+    const g = Math.round(255 - ratio * (255 - 163));
+    const b = Math.round(255 - ratio * (255 - 74));
+    const textColor = ratio > 0.55 ? "#14532d" : "var(--text)";
+    return { backgroundColor: `rgb(${r},${g},${b})`, color: textColor };
+  }
 
   function cellStyle(row: string, col: string, base?: React.CSSProperties) {
     const active = hovRow === row || hovCol === col;
@@ -166,8 +184,11 @@ export default function VisitorsTable({
                         className="px-3 py-1 text-right tabular-nums font-semibold whitespace-nowrap"
                         style={{
                           ...totColBase,
-                          backgroundColor: hovRow === date || hovCol === "__tot__" ? HOVER_BG : "#f4f7fb",
-                          color: hovRow === date || hovCol === "__tot__" ? HOVER_TEXT : "var(--text)",
+                          ...(hovRow === date || hovCol === "__tot__"
+                            ? { backgroundColor: HOVER_BG, color: HOVER_TEXT }
+                            : conditionalTotal
+                            ? totalCellBg(rowTotal)
+                            : { backgroundColor: "#f4f7fb", color: "var(--text)" }),
                         }}
                         onMouseEnter={() => setHovCol("__tot__")}
                       >

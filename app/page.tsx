@@ -30,6 +30,7 @@ export default async function Page() {
           siteShorts={ADSENSE_SITE_SHORTS}
           format="currency"
           maxHeight={270}
+          conditionalTotal
         />
         <EarningsChart data={adsenseMonthly} />
       </div>
