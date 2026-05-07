@@ -20,6 +20,8 @@ interface Props {
   siteShorts?: string[];
   format?: "integer" | "decimal" | "duration";
   aggregation?: "sum" | "avg";
+  maxHeight?: number;
+  showTotal?: boolean;
 }
 
 function formatDate(d: string) {
@@ -40,6 +42,8 @@ export default function VisitorsTable({
   siteShorts,
   format = "integer",
   aggregation = "sum",
+  maxHeight,
+  showTotal = true,
 }: Props) {
   const formatValue = (v: number) => {
     if (format === "decimal") return v.toFixed(1);
@@ -94,25 +98,25 @@ export default function VisitorsTable({
   const colBase: React.CSSProperties = { borderLeft: "1px solid var(--border)" };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <div>
-        <h2 className="text-sm font-semibold" style={{ color: "var(--text)" }}>{title}</h2>
-        <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{subtitle}</p>
+        <h2 className="text-xs font-semibold" style={{ color: "var(--text)" }}>{title}</h2>
+        <p className="text-xs" style={{ color: "var(--muted)" }}>{subtitle}</p>
       </div>
       <div
         className="rounded-xl overflow-hidden"
         style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 1px 4px rgba(26,39,68,0.06)" }}
         onMouseLeave={() => { setHovRow(null); setHovCol(null); }}
       >
-        <div>
+        <div style={maxHeight ? { maxHeight, overflowY: "auto" } : undefined}>
           <table className="w-full text-xs text-left">
             <thead className="sticky top-0 z-10" style={{ background: "#f0f4fa", borderBottom: "1px solid var(--border)" }}>
               <tr>
-                <th className="px-3 py-2 font-semibold whitespace-nowrap" style={{ color: "var(--muted)" }}>Dag</th>
+                <th className="px-3 py-1.5 font-semibold whitespace-nowrap" style={{ color: "var(--muted)" }}>Dag</th>
                 {siteNames.map((name, i) => (
                   <th
                     key={name}
-                    className="px-3 py-2 text-right font-semibold cursor-default"
+                    className="px-3 py-1.5 text-right font-semibold cursor-default"
                     style={{ ...colBase, color: hovCol === name ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === name ? HOVER_BG : undefined }}
                     onMouseEnter={() => setHovCol(name)}
                     title={name}
@@ -120,13 +124,15 @@ export default function VisitorsTable({
                     {siteShorts?.[i] ?? name}
                   </th>
                 ))}
-                <th
-                  className="px-3 py-2 text-right font-semibold cursor-default"
-                  style={{ ...totColBase, color: hovCol === "__tot__" ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === "__tot__" ? HOVER_BG : "#eef2f9" }}
-                  onMouseEnter={() => setHovCol("__tot__")}
-                >
-                  Totaal
-                </th>
+                {showTotal && (
+                  <th
+                    className="px-3 py-1.5 text-right font-semibold cursor-default"
+                    style={{ ...totColBase, color: hovCol === "__tot__" ? HOVER_TEXT : "var(--text)", backgroundColor: hovCol === "__tot__" ? HOVER_BG : "#eef2f9" }}
+                    onMouseEnter={() => setHovCol("__tot__")}
+                  >
+                    Totaal
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -154,17 +160,19 @@ export default function VisitorsTable({
                         {formatValue(lookup[name]?.[date] ?? 0)}
                       </td>
                     ))}
-                    <td
-                      className="px-3 py-1 text-right tabular-nums font-semibold whitespace-nowrap"
-                      style={{
-                        ...totColBase,
-                        backgroundColor: hovRow === date || hovCol === "__tot__" ? HOVER_BG : "#f4f7fb",
-                        color: hovRow === date || hovCol === "__tot__" ? HOVER_TEXT : "var(--text)",
-                      }}
-                      onMouseEnter={() => setHovCol("__tot__")}
-                    >
-                      {formatValue(rowTotal)}
-                    </td>
+                    {showTotal && (
+                      <td
+                        className="px-3 py-1 text-right tabular-nums font-semibold whitespace-nowrap"
+                        style={{
+                          ...totColBase,
+                          backgroundColor: hovRow === date || hovCol === "__tot__" ? HOVER_BG : "#f4f7fb",
+                          color: hovRow === date || hovCol === "__tot__" ? HOVER_TEXT : "var(--text)",
+                        }}
+                        onMouseEnter={() => setHovCol("__tot__")}
+                      >
+                        {formatValue(rowTotal)}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -188,17 +196,19 @@ export default function VisitorsTable({
                     {formatValue(siteTotals[name])}
                   </td>
                 ))}
-                <td
-                  className="px-3 py-1.5 text-right tabular-nums font-bold whitespace-nowrap"
-                  style={{
-                    ...totColBase,
-                    backgroundColor: hovRow === "__tot__" || hovCol === "__tot__" ? HOVER_BG : "#dbeafe",
-                    color: hovRow === "__tot__" || hovCol === "__tot__" ? HOVER_TEXT : "var(--primary)",
-                  }}
-                  onMouseEnter={() => setHovCol("__tot__")}
-                >
-                  {formatValue(grandTotal)}
-                </td>
+                {showTotal && (
+                  <td
+                    className="px-3 py-1.5 text-right tabular-nums font-bold whitespace-nowrap"
+                    style={{
+                      ...totColBase,
+                      backgroundColor: hovRow === "__tot__" || hovCol === "__tot__" ? HOVER_BG : "#dbeafe",
+                      color: hovRow === "__tot__" || hovCol === "__tot__" ? HOVER_TEXT : "var(--primary)",
+                    }}
+                    onMouseEnter={() => setHovCol("__tot__")}
+                  >
+                    {formatValue(grandTotal)}
+                  </td>
+                )}
               </tr>
             </tfoot>
           </table>
