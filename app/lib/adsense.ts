@@ -74,8 +74,17 @@ export async function getAdsenseMonthlyEarnings(months: number): Promise<MonthEa
 export async function getAdsenseEarnings(days: number): Promise<SiteData[]> {
   const token = await getAdsenseToken();
 
+  const end = new Date();
+  const start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - days + 1);
+
   const qs = [
-    `dateRange=LAST_${days}_DAYS`,
+    "dateRange=CUSTOM",
+    `startDate.year=${start.getFullYear()}`,
+    `startDate.month=${start.getMonth() + 1}`,
+    `startDate.day=${start.getDate()}`,
+    `endDate.year=${end.getFullYear()}`,
+    `endDate.month=${end.getMonth() + 1}`,
+    `endDate.day=${end.getDate()}`,
     "metrics=ESTIMATED_EARNINGS",
     "dimensions=DATE",
     "dimensions=DOMAIN_NAME",
