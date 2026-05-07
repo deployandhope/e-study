@@ -18,7 +18,7 @@ interface Props {
   sites: SiteData[];
   siteNames: string[];
   siteShorts?: string[];
-  format?: "integer" | "decimal" | "duration";
+  format?: "integer" | "decimal" | "duration" | "currency";
   aggregation?: "sum" | "avg";
   maxHeight?: number;
   showTotal?: boolean;
@@ -46,6 +46,7 @@ export default function VisitorsTable({
   showTotal = true,
 }: Props) {
   const formatValue = (v: number) => {
+    if (format === "currency") return "€ " + v.toFixed(2).replace(".", ",");
     if (format === "decimal") return v.toFixed(1);
     if (format === "duration") {
       const m = Math.floor(v / 60);
