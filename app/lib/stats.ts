@@ -29,9 +29,7 @@ export async function getTeacherStats(baseUrl: string): Promise<TeacherStats> {
   const url = `${baseUrl}/wp-json/estudy-stats/v1/teachers?token=${encodeURIComponent(token)}`;
   const crypto = await import("crypto");
   const hash = crypto.createHash("sha256").update(token).digest("hex");
-  console.log(
-    `[stats] fetch ${baseUrl} tokenSha256=${hash} tokenLength=${token.length}`
-  );
+  console.log(`[debug] sha=${hash} len=${token.length} site=${baseUrl}`);
   const res = await fetch(url, {
     headers: { "X-Estudy-Token": token },
     cache: "no-store",
