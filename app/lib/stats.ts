@@ -27,10 +27,11 @@ export async function getTeacherStats(baseUrl: string): Promise<TeacherStats> {
   if (!token) throw new Error("ESTUDY_STATS_TOKEN ontbreekt");
 
   const url = `${baseUrl}/wp-json/estudy-stats/v1/teachers?token=${encodeURIComponent(token)}`;
-  const tokenLen = token.length;
-  const tokenFirst = token.slice(0, 6);
-  const tokenLast = token.slice(-4);
-  console.log(`[stats] fetch ${baseUrl} token=${tokenFirst}...${tokenLast} len=${tokenLen}`);
+  const crypto = await import("crypto");
+  const hash = crypto.createHash("sha256").update(token).digest("hex");
+  console.log(
+    `[stats] fetch ${baseUrl} tokenSha256=${hash} tokenLength=${token.length}`
+  );
   const res = await fetch(url, {
     headers: { "X-Estudy-Token": token },
     cache: "no-store",
