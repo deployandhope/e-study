@@ -26,7 +26,8 @@ export async function getTeacherStats(baseUrl: string): Promise<TeacherStats> {
   const token = process.env.ESTUDY_STATS_TOKEN;
   if (!token) throw new Error("ESTUDY_STATS_TOKEN ontbreekt");
 
-  const res = await fetch(`${baseUrl}/wp-json/estudy-stats/v1/teachers`, {
+  const url = `${baseUrl}/wp-json/estudy-stats/v1/teachers?token=${encodeURIComponent(token)}`;
+  const res = await fetch(url, {
     headers: { "X-Estudy-Token": token },
     cache: "no-store",
   });

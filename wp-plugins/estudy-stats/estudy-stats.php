@@ -25,6 +25,9 @@ function estudy_stats_check_token(WP_REST_Request $request) {
     }
     $provided = $request->get_header('x-estudy-token');
     if (!is_string($provided) || $provided === '') {
+        $provided = $request->get_param('token');
+    }
+    if (!is_string($provided) || $provided === '') {
         return false;
     }
     return hash_equals($expected, $provided);
