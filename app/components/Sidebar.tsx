@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, Search, FolderTree } from "lucide-react";
+import { Globe, Search, FolderTree, Users } from "lucide-react";
 
 const nav = [
   { href: "/", label: "Overview", icon: Globe },
   { href: "/search-data", label: "Search Data", icon: Search },
   { href: "/page-categories", label: "Page Categories", icon: FolderTree },
+  { href: "/gebruikers", label: "Gebruikers", icon: Users },
 ];
 
 export default function Sidebar() {
