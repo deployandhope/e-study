@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, LayoutDashboard } from "lucide-react";
+import { Globe, Search, FolderTree } from "lucide-react";
 
 const nav = [
-  { href: "/", label: "Alle Domeinen", icon: Globe },
-  { href: "/mijntafeldiploma", label: "MijnTafeldiploma", icon: LayoutDashboard },
+  { href: "/", label: "Overview", icon: Globe },
+  { href: "/search-data", label: "Search Data", icon: Search },
+  { href: "/page-categories", label: "Page Categories", icon: FolderTree },
 ];
 
 export default function Sidebar() {

@@ -13,6 +13,8 @@ import { MonthEarnings } from "../lib/adsense";
 
 interface Props {
   data: MonthEarnings[];
+  title?: string;
+  subtitle?: string;
 }
 
 const PRIMARY = "#2563eb";
@@ -22,17 +24,21 @@ function formatEuro(v: number) {
   return "€ " + v.toFixed(2).replace(".", ",");
 }
 
-export default function EarningsChart({ data }: Props) {
+export default function EarningsChart({
+  data,
+  title = "AdSense — maandelijkse inkomsten",
+  subtitle = "estimatedEarnings per maand (EUR)",
+}: Props) {
   const lastIdx = data.length - 1;
 
   return (
     <div className="flex flex-col gap-2">
       <div>
         <h2 className="text-xs font-semibold" style={{ color: "var(--text)" }}>
-          AdSense — maandelijkse inkomsten
+          {title}
         </h2>
         <p className="text-xs" style={{ color: "var(--muted)" }}>
-          estimatedEarnings per maand (EUR) · afgelopen 36 maanden
+          {subtitle}
         </p>
       </div>
       <div
