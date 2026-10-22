@@ -31,8 +31,48 @@ export default async function GebruikersPage() {
     })
   );
 
+  const grandTotal = results.reduce((sum, s) => sum + (s.stats?.teachers_total ?? 0), 0);
+
   return (
     <div className="p-5 flex flex-col gap-6">
+      <section className="flex flex-col gap-2">
+        <div>
+          <h1 className="text-base font-semibold" style={{ color: "var(--text)" }}>
+            Totale gebruikers per website
+          </h1>
+          <p className="text-xs" style={{ color: "var(--muted)" }}>
+            teacher-accounts op dit moment · live
+          </p>
+        </div>
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: `repeat(${results.length + 1}, minmax(0, 1fr))` }}
+        >
+          {results.map((s) => (
+            <div
+              key={s.short}
+              className="rounded-xl px-4 py-3"
+              style={{ background: "var(--card)", border: "1px solid var(--border)", boxShadow: "0 1px 4px rgba(26,39,68,0.06)" }}
+            >
+              <div className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{s.short}</div>
+              <div className="text-xl font-bold tabular-nums" style={{ color: "var(--text)" }}>
+                {s.stats ? s.stats.teachers_total.toLocaleString("nl-NL") : "—"}
+              </div>
+              <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{s.name}</div>
+            </div>
+          ))}
+          <div
+            className="rounded-xl px-4 py-3"
+            style={{ background: "#dbeafe", border: "1px solid var(--border)", boxShadow: "0 1px 4px rgba(26,39,68,0.06)" }}
+          >
+            <div className="text-xs font-semibold" style={{ color: "var(--muted)" }}>Totaal</div>
+            <div className="text-xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>
+              {grandTotal.toLocaleString("nl-NL")}
+            </div>
+            <div className="text-xs truncate" style={{ color: "var(--muted)" }}>Alle websites</div>
+          </div>
+        </div>
+      </section>
       {results.map((s) => {
         if (!s.stats) {
           return (
