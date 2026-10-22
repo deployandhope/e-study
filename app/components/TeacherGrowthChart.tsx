@@ -17,15 +17,19 @@ interface Row {
   date: string;
   daily: number;
   cumulative: number;
+  facebook?: number;
+  facebookCumulative?: number;
 }
 
 interface Props {
   title: string;
   subtitle: string;
   data: Row[];
+  showFacebook?: boolean;
 }
 
 const PRIMARY = "#2563eb";
+const FACEBOOK = "#f59e0b";
 
 function formatDate(d: string) {
   const [y, m, day] = d.split("-");
@@ -46,11 +50,13 @@ function CustomTooltip({
   payload,
   label,
   mode,
+  showFacebook,
 }: {
   active?: boolean;
   payload?: TooltipPayloadItem[];
   label?: string;
   mode: "cumulative" | "daily";
+  showFacebook?: boolean;
 }) {
   if (!active || !payload || !payload.length) return null;
   const row = payload[0].payload;
@@ -73,11 +79,19 @@ function CustomTooltip({
           {(mode === "cumulative" ? row.cumulative : row.daily).toLocaleString("nl-NL")}
         </span>
       </div>
+      {showFacebook && (
+        <div style={{ color: FACEBOOK }}>
+          Via Facebook:{" "}
+          <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
+            {((mode === "cumulative" ? row.facebookCumulative : row.facebook) ?? 0).toLocaleString("nl-NL")}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
 
-export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
+export default function TeacherGrowthChart({ title, subtitle, data, showFacebook = false }: Props) {
   const [mode, setMode] = useState<"cumulative" | "daily">("cumulative");
 
   return (
@@ -91,6 +105,17 @@ export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
             {subtitle}
           </p>
         </div>
+        <div className="flex items-center gap-3">
+        {showFacebook && (
+          <div className="flex items-center gap-3 text-xs" style={{ color: "var(--muted)" }}>
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-2 h-2 rounded-full" style={{ background: PRIMARY }} /> Alle registraties
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-2 h-2 rounded-full" style={{ background: FACEBOOK }} /> Via Facebook
+            </span>
+          </div>
+        )}
         <div
           className="inline-flex rounded-md text-xs overflow-hidden"
           style={{ border: "1px solid var(--border)" }}
@@ -116,6 +141,7 @@ export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
           >
             Per dag
           </button>
+        </div>
         </div>
       </div>
       <div
@@ -146,7 +172,7 @@ export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
                 tickLine={false}
                 width={42}
               />
-              <Tooltip content={<CustomTooltip mode={mode} />} cursor={{ stroke: "var(--border)" }} />
+              <Tooltip content={<CustomTooltip mode={mode} showFacebook={showFacebook} />} cursor={{ stroke: "var(--border)" }} />
               <Line
                 type="monotone"
                 dataKey="cumulative"
@@ -155,6 +181,16 @@ export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
                 dot={false}
                 isAnimationActive={false}
               />
+              {showFacebook && (
+                <Line
+                  type="monotone"
+                  dataKey="facebookCumulative"
+                  stroke={FACEBOOK}
+                  strokeWidth={2}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              )}
             </LineChart>
           ) : (
             <BarChart data={data} margin={{ top: 4, right: 8, bottom: 30, left: 0 }}>
@@ -175,8 +211,9 @@ export default function TeacherGrowthChart({ title, subtitle, data }: Props) {
                 tickLine={false}
                 width={42}
               />
-              <Tooltip content={<CustomTooltip mode={mode} />} cursor={{ fill: "rgba(26,39,68,0.06)" }} />
+              <Tooltip content={<CustomTooltip mode={mode} showFacebook={showFacebook} />} cursor={{ fill: "rgba(26,39,68,0.06)" }} />
               <Bar dataKey="daily" fill={PRIMARY} isAnimationActive={false} />
+              {showFacebook && <Bar dataKey="facebook" fill={FACEBOOK} isAnimationActive={false} />}
             </BarChart>
           )}
         </ResponsiveContainer>

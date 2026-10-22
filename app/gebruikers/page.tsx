@@ -7,6 +7,7 @@ import {
   STATS_SITES,
   TeacherStats,
 } from "../lib/stats";
+import { getFacebookRegistrations } from "../lib/meta";
 import TeacherGrowthChart from "../components/TeacherGrowthChart";
 
 interface SiteResult {
@@ -18,6 +19,10 @@ interface SiteResult {
 }
 
 export default async function GebruikersPage() {
+  const facebookPromise = getFacebookRegistrations().catch((err) => {
+    console.error("[gebruikers] Facebook failed:", err instanceof Error ? err.message : String(err));
+    return null;
+  });
   const results: SiteResult[] = await Promise.all(
     STATS_SITES.map(async (s) => {
       try {
@@ -31,7 +36,11 @@ export default async function GebruikersPage() {
     })
   );
 
+  const facebook = await facebookPromise;
+  const facebookTotal = (short: string) =>
+    (facebook?.[short] ?? []).reduce((sum, d) => sum + d.count, 0);
   const grandTotal = results.reduce((sum, s) => sum + (s.stats?.teachers_total ?? 0), 0);
+  const grandFacebook = results.reduce((sum, s) => sum + (s.stats ? facebookTotal(s.short) : 0), 0);
 
   return (
     <div className="p-5 flex flex-col gap-6">
@@ -41,7 +50,7 @@ export default async function GebruikersPage() {
             Totale gebruikers per website
           </h1>
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            teacher-accounts op dit moment · live
+            teacher-accounts op dit moment · live · via Facebook = Meta-attributie (1 dag na weergave / 7 dagen na klik)
           </p>
         </div>
         <div
@@ -59,6 +68,9 @@ export default async function GebruikersPage() {
                 {s.stats ? s.stats.teachers_total.toLocaleString("nl-NL") : "—"}
               </div>
               <div className="text-xs truncate" style={{ color: "var(--muted)" }}>{s.name}</div>
+              <div className="text-xs mt-1 tabular-nums" style={{ color: "#b45309" }}>
+                {facebook && s.stats ? `via Facebook: ${facebookTotal(s.short).toLocaleString("nl-NL")}` : "via Facebook: —"}
+              </div>
             </div>
           ))}
           <div
@@ -70,6 +82,9 @@ export default async function GebruikersPage() {
               {grandTotal.toLocaleString("nl-NL")}
             </div>
             <div className="text-xs truncate" style={{ color: "var(--muted)" }}>Alle websites</div>
+            <div className="text-xs mt-1 tabular-nums" style={{ color: "#b45309" }}>
+              {facebook ? `via Facebook: ${grandFacebook.toLocaleString("nl-NL")}` : "via Facebook: —"}
+            </div>
           </div>
         </div>
       </section>
@@ -95,11 +110,20 @@ export default async function GebruikersPage() {
         }
         const filled = fillMissingDays(s.stats.daily);
         const cumulative = buildCumulative(filled);
-        const rows = filled.map((d, i) => ({
-          date: d.date,
-          daily: d.count,
-          cumulative: cumulative[i].count,
-        }));
+        const fbByDate = Object.fromEntries((facebook?.[s.short] ?? []).map((d) => [d.date, d.count]));
+        const hasFacebook = Object.keys(fbByDate).length > 0;
+        let fbRunning = 0;
+        const rows = filled.map((d, i) => {
+          const fb = fbByDate[d.date] ?? 0;
+          fbRunning += fb;
+          return {
+            date: d.date,
+            daily: d.count,
+            cumulative: cumulative[i].count,
+            facebook: fb,
+            facebookCumulative: fbRunning,
+          };
+        });
         return (
           <section key={s.short} className="flex flex-col gap-4">
             <div>
@@ -116,6 +140,7 @@ export default async function GebruikersPage() {
               title={`${s.name} — verloop`}
               subtitle="Toggle tussen cumulatief en nieuw per dag"
               data={rows}
+              showFacebook={hasFacebook}
             />
           </section>
         );
