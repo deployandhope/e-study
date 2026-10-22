@@ -25,6 +25,7 @@ const DEFAULT_SITES: SiteDef[] = [
   { short: "VS", name: "Verhaalsommen", color: "#14b8a6" },
   { short: "MTD", name: "MijnTafeldiploma", color: "#f97316" },
   { short: "MWP", name: "MathWordProblems", color: "#ec4899" },
+  { short: "RD", name: "Rekendiploma", color: "#8b5cf6" },
 ];
 
 interface Props {

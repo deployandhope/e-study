@@ -21,7 +21,7 @@ export default async function GebruikersPage() {
   const results: SiteResult[] = await Promise.all(
     STATS_SITES.map(async (s) => {
       try {
-        const stats = await getTeacherStats(s.baseUrl);
+        const stats = await getTeacherStats(s.baseUrl, s.statsPath);
         return { ...s, stats, error: null };
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);

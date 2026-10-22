@@ -11,11 +11,13 @@ const ADSENSE_ACCOUNT = "accounts/pub-6978384984633173";
 const DOMAIN_MAP: Record<string, string> = {
   "oefenbegrijpendlezen.nl": "OefenBegrijpendLezen",
   "verhaalsommen.nl": "Verhaalsommen",
+  "mijntafeldiploma.nl": "MijnTafeldiploma",
   "mathwordproblems.com": "MathWordProblems",
+  "rekendiploma.nl": "Rekendiploma",
 };
 
-export const ADSENSE_SITE_NAMES = ["OefenBegrijpendLezen", "Verhaalsommen", "MathWordProblems"];
-export const ADSENSE_SITE_SHORTS = ["OBL", "VS", "MWP"];
+export const ADSENSE_SITE_NAMES = ["OefenBegrijpendLezen", "Verhaalsommen", "MijnTafeldiploma", "MathWordProblems", "Rekendiploma"];
+export const ADSENSE_SITE_SHORTS = ["OBL", "VS", "MTD", "MWP", "RD"];
 
 async function getAdsenseToken(): Promise<string> {
   const auth = new OAuth2Client(
@@ -74,7 +76,9 @@ export async function getAdsenseMonthlyEarnings(months: number): Promise<MonthEa
 const DOMAIN_TO_SHORT: Record<string, string> = {
   "oefenbegrijpendlezen.nl": "OBL",
   "verhaalsommen.nl": "VS",
+  "mijntafeldiploma.nl": "MTD",
   "mathwordproblems.com": "MWP",
+  "rekendiploma.nl": "RD",
 };
 
 export interface DailyEarningsRow {

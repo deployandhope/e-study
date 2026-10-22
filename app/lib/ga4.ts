@@ -15,6 +15,7 @@ export const PROPERTIES = [
   { id: "301641883", name: "Verhaalsommen", short: "VS" },
   { id: "530166190", name: "MijnTafeldiploma", short: "MTD" },
   { id: "371057702", name: "MathWordProblems", short: "MWP" },
+  { id: "556034694", name: "Rekendiploma", short: "RD" },
 ];
 
 async function getAccessToken(): Promise<string> {
@@ -279,7 +280,7 @@ export async function getPageViewsByPath(
   );
 }
 
-export async function getMetricLast7Days(metric: string): Promise<SiteData[]> {
+export async function getMetricLastDays(metric: string, days: number): Promise<SiteData[]> {
   const token = await getAccessToken();
 
   return Promise.all(
@@ -295,7 +296,7 @@ export async function getMetricLast7Days(metric: string): Promise<SiteData[]> {
           body: JSON.stringify({
             dimensions: [{ name: "date" }],
             metrics: [{ name: metric }],
-            dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: `${days - 1}daysAgo`, endDate: "today" }],
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
           }),
           cache: "no-store",

@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getMetricLast7Days, getCombinedDailyMetric, PROPERTIES } from "./lib/ga4";
+import { getMetricLastDays, getCombinedDailyMetric, PROPERTIES } from "./lib/ga4";
 import { getAdsenseEarnings, getAdsenseMonthlyEarnings, getAdsenseDailyByDomain, getAdsenseMonthlyByDomain, ADSENSE_SITE_NAMES, ADSENSE_SITE_SHORTS } from "./lib/adsense";
 import VisitorsTable from "./components/VisitorsTable";
 import EarningsChart from "./components/EarningsChart";
@@ -12,11 +12,11 @@ export default async function Page() {
     (now.getFullYear() - 2022) * 12 + (now.getMonth() - 2) + 1;
 
   const [users, views, duration, totalUsers, adsenseEarnings, adsenseMonthly, dailyUsers, dailyEarnings, monthlyByDomain] = await Promise.all([
-    getMetricLast7Days("activeUsers"),
-    getMetricLast7Days("screenPageViewsPerUser"),
-    getMetricLast7Days("averageSessionDuration"),
-    getMetricLast7Days("totalUsers"),
-    getAdsenseEarnings(30),
+    getMetricLastDays("activeUsers", 30),
+    getMetricLastDays("screenPageViewsPerUser", 30),
+    getMetricLastDays("averageSessionDuration", 30),
+    getMetricLastDays("totalUsers", 30),
+    getAdsenseEarnings(now.getDate()),
     getAdsenseMonthlyEarnings(monthlyMonthsSinceMar2022),
     getCombinedDailyMetric("totalUsers", 183),
     getAdsenseDailyByDomain(183),
@@ -26,7 +26,9 @@ export default async function Page() {
   const ADSENSE_SITES = [
     { short: "OBL", name: "OefenBegrijpendLezen", color: "#2563eb" },
     { short: "VS", name: "Verhaalsommen", color: "#14b8a6" },
+    { short: "MTD", name: "MijnTafeldiploma", color: "#f97316" },
     { short: "MWP", name: "MathWordProblems", color: "#ec4899" },
+    { short: "RD", name: "Rekendiploma", color: "#8b5cf6" },
   ];
 
   const siteNames = PROPERTIES.map((p) => p.name);
@@ -37,13 +39,15 @@ export default async function Page() {
       <div className="grid grid-cols-2 gap-4">
         <VisitorsTable
           title="AdSense — geschatte inkomsten"
-          subtitle="estimatedEarnings per dag (EUR) · afgelopen 30 dagen"
+          subtitle="estimatedEarnings per dag (EUR) · deze maand"
           sites={adsenseEarnings}
           siteNames={ADSENSE_SITE_NAMES}
           siteShorts={ADSENSE_SITE_SHORTS}
           format="currency"
           maxHeight={270}
           conditionalTotal
+          dense
+          stickyFooter
         />
         <EarningsChart data={adsenseMonthly} />
       </div>
@@ -70,6 +74,8 @@ export default async function Page() {
           <VisitorsTable
             title="Actieve gebruikers"
             subtitle="activeUsers per dag"
+            maxHeight={258}
+            stickyFooter
             sites={users}
             siteNames={siteNames}
             siteShorts={siteShorts}
@@ -77,6 +83,8 @@ export default async function Page() {
           <VisitorsTable
             title="Gemiddelde sessieduur"
             subtitle="averageSessionDuration per dag"
+            maxHeight={258}
+            stickyFooter
             sites={duration}
             siteNames={siteNames}
             siteShorts={siteShorts}
@@ -88,6 +96,8 @@ export default async function Page() {
           <VisitorsTable
             title="Views per gebruiker"
             subtitle="screenPageViewsPerUser per dag"
+            maxHeight={258}
+            stickyFooter
             sites={views}
             siteNames={siteNames}
             siteShorts={siteShorts}
@@ -97,6 +107,8 @@ export default async function Page() {
           <VisitorsTable
             title="Totale gebruikers"
             subtitle="totalUsers per dag"
+            maxHeight={258}
+            stickyFooter
             sites={totalUsers}
             siteNames={siteNames}
             siteShorts={siteShorts}

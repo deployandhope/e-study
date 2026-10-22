@@ -87,6 +87,7 @@ interface Props {
   format?: "integer" | "decimal" | "duration" | "currency";
   aggregation?: "sum" | "avg";
   maxHeight?: number;
+  stickyFooter?: boolean;
   showTotal?: boolean;
   conditionalTotal?: boolean;
   dateFormat?: "day" | "month";
@@ -96,6 +97,7 @@ interface Props {
   headerRight?: React.ReactNode;
   columnInfo?: Record<string, string[]>;
   compact?: boolean;
+  dense?: boolean;
 }
 
 const NL_MONTHS_SHORT = ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
@@ -125,6 +127,7 @@ export default function VisitorsTable({
   format = "integer",
   aggregation = "sum",
   maxHeight,
+  stickyFooter = false,
   showTotal = true,
   conditionalTotal = false,
   dateFormat = "day",
@@ -134,10 +137,12 @@ export default function VisitorsTable({
   headerRight,
   columnInfo,
   compact = false,
+  dense = false,
 }: Props) {
-  const padHead = compact ? "px-2 py-0.5" : "px-3 py-1.5";
-  const padBody = compact ? "px-2 py-0" : "px-3 py-1";
-  const padFoot = compact ? "px-2 py-0.5" : "px-3 py-1.5";
+  const padX = compact || dense ? "px-2" : "px-3";
+  const padHead = `${padX} ${compact ? "py-0.5" : "py-1.5"}`;
+  const padBody = `${padX} ${compact ? "py-0" : "py-1"}`;
+  const padFoot = `${padX} ${compact ? "py-0.5" : "py-1.5"}`;
   const formatDate = dateFormat === "month" ? formatMonth : formatDay;
   const formatValue = (v: number) => {
     if (format === "currency")
@@ -282,7 +287,7 @@ export default function VisitorsTable({
                       return (
                         <td
                           key={name}
-                          className={`${padBody} text-right tabular-nums`}
+                          className={`${padBody} text-right tabular-nums whitespace-nowrap`}
                           style={{ ...colBase, ...cellStyle(date, name, colBase) }}
                           onMouseEnter={() => setHovCol(name)}
                         >
@@ -324,7 +329,7 @@ export default function VisitorsTable({
                 );
               })}
             </tbody>
-            <tfoot>
+            <tfoot className={stickyFooter ? "sticky bottom-0 z-10" : undefined}>
               <tr
                 style={{ borderTop: "2px solid var(--border)", background: "#eef2f9" }}
                 onMouseEnter={() => setHovRow("__tot__")}
@@ -336,7 +341,7 @@ export default function VisitorsTable({
                 {siteNames.map((name) => (
                   <td
                     key={name}
-                    className={`${padFoot} text-right tabular-nums font-semibold`}
+                    className={`${padFoot} text-right tabular-nums font-semibold whitespace-nowrap`}
                     style={{ ...colBase, ...cellStyle("__tot__", name, colBase) }}
                     onMouseEnter={() => setHovCol(name)}
                   >

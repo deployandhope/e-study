@@ -13,6 +13,7 @@ export interface StatsSite {
   short: string;
   name: string;
   baseUrl: string;
+  statsPath?: string;
 }
 
 export const STATS_SITES: StatsSite[] = [
@@ -20,19 +21,27 @@ export const STATS_SITES: StatsSite[] = [
   { short: "OBL", name: "OefenBegrijpendLezen", baseUrl: "https://oefenbegrijpendlezen.nl" },
   { short: "VS", name: "Verhaalsommen", baseUrl: "https://verhaalsommen.nl" },
   { short: "MWP", name: "MathWordProblems", baseUrl: "https://mathwordproblems.com" },
+  { short: "RD", name: "Rekendiploma", baseUrl: "https://rekendiploma.nl", statsPath: "/api/stats.php" },
 ];
 
-export async function getTeacherStats(baseUrl: string): Promise<TeacherStats> {
+export async function getTeacherStats(
+  baseUrl: string,
+  statsPath = "/wp-json/estudy-stats/v1/teachers"
+): Promise<TeacherStats> {
   const token = process.env.ESTUDY_STATS_TOKEN;
   if (!token) throw new Error("ESTUDY_STATS_TOKEN ontbreekt");
 
-  const url = `${baseUrl}/wp-json/estudy-stats/v1/teachers?token=${encodeURIComponent(token)}`;
+  const url = `${baseUrl}${statsPath}?token=${encodeURIComponent(token)}`;
   const res = await fetch(url, {
     headers: { "X-Estudy-Token": token },
     cache: "no-store",
   });
 
-  if (!res.ok) throw new Error(`eStudy stats fout (${baseUrl}): ${res.status} ${await res.text()}`);
+  if (!res.ok) {
+    const body = await res.text();
+    const detail = body.trimStart().startsWith("<") ? "" : ` ${body.slice(0, 200)}`;
+    throw new Error(`eStudy stats fout (${baseUrl}${statsPath}): ${res.status}${detail}`);
+  }
   return (await res.json()) as TeacherStats;
 }
 
