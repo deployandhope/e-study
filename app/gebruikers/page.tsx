@@ -6,7 +6,9 @@ import {
   buildCumulative,
   STATS_SITES,
   TeacherStats,
+  getMtdRegistraties,
 } from "../lib/stats";
+import MtdRegistraties from "../components/MtdRegistraties";
 import { getFacebookRegistrations } from "../lib/meta";
 import TeacherGrowthChart from "../components/TeacherGrowthChart";
 
@@ -23,6 +25,10 @@ export default async function GebruikersPage() {
     console.error("[gebruikers] Facebook failed:", err instanceof Error ? err.message : String(err));
     return null;
   });
+  const registratiesPromise = getMtdRegistraties().catch((err) => {
+    console.error("[gebruikers] MTD registraties failed:", err instanceof Error ? err.message : String(err));
+    return null;
+  });
   const results: SiteResult[] = await Promise.all(
     STATS_SITES.map(async (s) => {
       try {
@@ -37,6 +43,7 @@ export default async function GebruikersPage() {
   );
 
   const facebook = await facebookPromise;
+  const registraties = await registratiesPromise;
   const facebookTotal = (short: string) =>
     (facebook?.[short] ?? []).reduce((sum, d) => sum + d.count, 0);
   const grandTotal = results.reduce((sum, s) => sum + (s.stats?.teachers_total ?? 0), 0);
@@ -88,6 +95,7 @@ export default async function GebruikersPage() {
           </div>
         </div>
       </section>
+      {registraties && <MtdRegistraties registraties={registraties} />}
       {results.map((s) => {
         if (!s.stats) {
           return (
