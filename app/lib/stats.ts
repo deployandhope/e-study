@@ -31,7 +31,8 @@ export async function getTeacherStats(
   const token = process.env.ESTUDY_STATS_TOKEN;
   if (!token) throw new Error("ESTUDY_STATS_TOKEN ontbreekt");
 
-  const url = `${baseUrl}${statsPath}?token=${encodeURIComponent(token)}`;
+  // Het token alleen in de header: in de URL komt het in de toegangslogs van de sites terecht.
+  const url = `${baseUrl}${statsPath}`;
   const res = await fetch(url, {
     headers: { "X-Estudy-Token": token },
     cache: "no-store",
