@@ -22,6 +22,7 @@ export const STATS_SITES: StatsSite[] = [
   { short: "VS", name: "Verhaalsommen", baseUrl: "https://verhaalsommen.nl" },
   { short: "MWP", name: "MathWordProblems", baseUrl: "https://mathwordproblems.com" },
   { short: "RD", name: "Rekendiploma", baseUrl: "https://rekendiploma.nl", statsPath: "/api/stats.php" },
+  { short: "TTT", name: "TimesTablesTrainer", baseUrl: "https://timestablestrainer.com" },
 ];
 
 export async function getTeacherStats(
