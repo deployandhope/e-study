@@ -8,6 +8,7 @@ const GRAPH = "https://graph.facebook.com/v21.0";
 const CUSTOM_CONVERSION_SITE: Record<string, string> = {
   "offsite_conversion.custom.2205177560035641": "RD",
   "offsite_conversion.custom.1128495249713539": "OBL",
+  "offsite_conversion.custom.1831254821476703": "TTT",
 };
 
 // Campagnes zonder custom conversion (oudere, of op een eigen sitepixel) vallen
@@ -17,6 +18,7 @@ const CAMPAIGN_PREFIX_SITE: [string, string][] = [
   ["obl-", "OBL"],
   ["oefenbegrijpendlezen", "OBL"],
   ["rekendiploma", "RD"],
+  ["timestablestrainer", "TTT"],
 ];
 
 const PIXEL_REGISTRATION = "offsite_conversion.fb_pixel_complete_registration";
