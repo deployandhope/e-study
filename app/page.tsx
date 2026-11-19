@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getMetricLastDays, getCombinedDailyMetric, PROPERTIES } from "./lib/ga4";
+import { getMetricLastDays, getCombinedDailyMetric, PROPERTIES, SUBSET_SITE_NAMES } from "./lib/ga4";
 import { getAdsenseEarnings, getAdsenseMonthlyEarnings, getAdsenseDailyByDomain, getAdsenseMonthlyByDomain, ADSENSE_SITE_NAMES, ADSENSE_SITE_SHORTS } from "./lib/adsense";
 import VisitorsTable from "./components/VisitorsTable";
 import EarningsChart from "./components/EarningsChart";
@@ -35,6 +35,7 @@ export default async function Page() {
   const GA4_SITES = [
     ...ADSENSE_SITES,
     { short: "TTT", name: "TimesTablesTrainer", color: "#16a34a" },
+    { short: "TTT (US)", name: "TimesTablesTrainer (US)", color: "#dc2626", excludeFromTotal: true },
   ];
 
   const siteNames = PROPERTIES.map((p) => p.name);
@@ -86,6 +87,7 @@ export default async function Page() {
             sites={users}
             siteNames={siteNames}
             siteShorts={siteShorts}
+            excludeFromTotal={SUBSET_SITE_NAMES}
           />
           <VisitorsTable
             title="Gemiddelde sessieduur"
@@ -95,6 +97,7 @@ export default async function Page() {
             sites={duration}
             siteNames={siteNames}
             siteShorts={siteShorts}
+            excludeFromTotal={SUBSET_SITE_NAMES}
             format="duration"
             aggregation="avg"
           />
@@ -108,6 +111,7 @@ export default async function Page() {
             sites={views}
             siteNames={siteNames}
             siteShorts={siteShorts}
+            excludeFromTotal={SUBSET_SITE_NAMES}
             format="decimal"
             aggregation="avg"
           />
@@ -119,6 +123,7 @@ export default async function Page() {
             sites={totalUsers}
             siteNames={siteNames}
             siteShorts={siteShorts}
+            excludeFromTotal={SUBSET_SITE_NAMES}
           />
         </div>
       </div>

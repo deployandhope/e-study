@@ -18,6 +18,8 @@ export interface SiteDef {
   short: string;
   name: string;
   color: string;
+  /** Wel een lijn, maar niet in het totaal van de tooltip (een deel van een andere site). */
+  excludeFromTotal?: boolean;
 }
 
 const DEFAULT_SITES: SiteDef[] = [
@@ -70,14 +72,18 @@ function CustomTooltip({
   payload,
   label,
   format = "integer",
+  excluded = [],
 }: {
+  excluded?: string[];
   active?: boolean;
   payload?: TooltipPayloadItem[];
   label?: string;
   format?: "integer" | "currency";
 }) {
   if (!active || !payload || !payload.length) return null;
-  const total = payload.reduce((s, p) => s + (Number(p.value) || 0), 0);
+  const total = payload
+    .filter((p) => !excluded.includes(p.dataKey ?? ""))
+    .reduce((s, p) => s + (Number(p.value) || 0), 0);
   return (
     <div
       style={{
@@ -191,7 +197,12 @@ export default function ClicksLineChart({
               tickFormatter={(v) => formatAxis(v, format)}
             />
             <Tooltip
-              content={<CustomTooltip format={format} />}
+              content={
+                <CustomTooltip
+                  format={format}
+                  excluded={sites.filter((s) => s.excludeFromTotal).map((s) => s.short)}
+                />
+              }
               cursor={{ stroke: "var(--border)" }}
             />
             {sites.map((s) => (

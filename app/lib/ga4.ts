@@ -10,14 +10,36 @@ export interface SiteData {
   data: DayData[];
 }
 
-export const PROPERTIES = [
+export interface Property {
+  id: string;
+  name: string;
+  short: string;
+  /** Alleen verkeer uit dit land (GA4-landnaam), bijvoorbeeld "United States". */
+  country?: string;
+}
+
+export const PROPERTIES: Property[] = [
   { id: "400810268", name: "OefenBegrijpendLezen", short: "OBL" },
   { id: "301641883", name: "Verhaalsommen", short: "VS" },
   { id: "530166190", name: "MijnTafeldiploma", short: "MTD" },
   { id: "371057702", name: "MathWordProblems", short: "MWP" },
   { id: "556034694", name: "Rekendiploma", short: "RD" },
   { id: "538361242", name: "TimesTablesTrainer", short: "TTT" },
+  { id: "538361242", name: "TimesTablesTrainer (US)", short: "TTT (US)", country: "United States" },
 ];
+
+/** Sites die een deel van een andere site zijn: buiten de totalen, anders telt hun verkeer dubbel. */
+export const SUBSET_SITE_NAMES = PROPERTIES.filter((p) => p.country).map((p) => p.name);
+
+/** Het GA4-filter van een site met een landfilter; leeg voor een site zonder. */
+function countryFilter(country?: string): Record<string, unknown> {
+  if (!country) return {};
+  return {
+    dimensionFilter: {
+      filter: { fieldName: "country", stringFilter: { matchType: "EXACT", value: country } },
+    },
+  };
+}
 
 async function getAccessToken(): Promise<string> {
   const auth = new OAuth2Client(
@@ -90,7 +112,8 @@ export interface ChannelMonthData {
 
 export async function getChannelBreakdownByMonth(
   propertyId: string,
-  months: number
+  months: number,
+  country?: string
 ): Promise<{ data: ChannelMonthData[]; channels: string[] }> {
   const token = await getAccessToken();
 
@@ -109,6 +132,7 @@ export async function getChannelBreakdownByMonth(
         metrics: [{ name: "activeUsers" }],
         dateRanges: [{ startDate: fmt(start), endDate: fmt(end) }],
         orderBys: [{ dimension: { dimensionName: "yearMonth" }, desc: false }],
+        ...countryFilter(country),
       }),
       cache: "no-store",
     }
@@ -164,7 +188,7 @@ export async function getCombinedDailyMetric(
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
   const perSite = await Promise.all(
-    PROPERTIES.map(async ({ id, short, name }) => {
+    PROPERTIES.map(async ({ id, short, name, country }) => {
       const res = await fetch(
         `https://analyticsdata.googleapis.com/v1beta/properties/${id}:runReport`,
         {
@@ -175,6 +199,7 @@ export async function getCombinedDailyMetric(
             metrics: [{ name: metric }],
             dateRanges: [{ startDate: fmt(start), endDate: fmt(end) }],
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
+            ...countryFilter(country),
           }),
           cache: "no-store",
         }
@@ -285,7 +310,7 @@ export async function getMetricLastDays(metric: string, days: number): Promise<S
   const token = await getAccessToken();
 
   return Promise.all(
-    PROPERTIES.map(async ({ id, name }) => {
+    PROPERTIES.map(async ({ id, name, country }) => {
       const res = await fetch(
         `https://analyticsdata.googleapis.com/v1beta/properties/${id}:runReport`,
         {
@@ -299,6 +324,7 @@ export async function getMetricLastDays(metric: string, days: number): Promise<S
             metrics: [{ name: metric }],
             dateRanges: [{ startDate: `${days - 1}daysAgo`, endDate: "today" }],
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
+            ...countryFilter(country),
           }),
           cache: "no-store",
         }

@@ -10,7 +10,7 @@ export default async function SearchData() {
   const [channelResults, keywordResults, dailyClicks] = await Promise.all([
     Promise.all(
       PROPERTIES.map(async (p) => {
-        const r = await getChannelBreakdownByMonth(p.id, 20);
+        const r = await getChannelBreakdownByMonth(p.id, 20, p.country);
         return { name: p.name, ...r };
       })
     ),

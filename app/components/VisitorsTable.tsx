@@ -84,6 +84,8 @@ interface Props {
   sites: SiteData[];
   siteNames: string[];
   siteShorts?: string[];
+  /** Sitenamen die wel een kolom krijgen maar niet in de totalen meetellen. */
+  excludeFromTotal?: string[];
   format?: "integer" | "decimal" | "duration" | "currency";
   aggregation?: "sum" | "avg";
   maxHeight?: number;
@@ -124,6 +126,7 @@ export default function VisitorsTable({
   sites,
   siteNames,
   siteShorts,
+  excludeFromTotal = [],
   format = "integer",
   aggregation = "sum",
   maxHeight,
@@ -184,10 +187,12 @@ export default function VisitorsTable({
       aggregate(allDates.map((d) => lookup[name]?.[d] ?? 0)),
     ])
   );
-  const grandTotal = aggregate(Object.values(siteTotals));
+  const totalNames = siteNames.filter((name) => !excludeFromTotal.includes(name));
+  const totalValues = totalNames.map((name) => siteTotals[name]);
+  const grandTotal = aggregate(totalValues);
 
   const rowTotals = allDates.map((date) =>
-    aggregate(siteNames.map((name) => lookup[name]?.[date] ?? 0))
+    aggregate(totalNames.map((name) => lookup[name]?.[date] ?? 0))
   );
   const minTotal = Math.min(...rowTotals);
   const maxTotal = Math.max(...rowTotals);
@@ -267,8 +272,7 @@ export default function VisitorsTable({
             </thead>
             <tbody>
               {allDates.map((date, i) => {
-                const rowVals = siteNames.map((name) => lookup[name]?.[date] ?? 0);
-                const rowTotal = aggregate(rowVals);
+                const rowTotal = rowTotals[i];
                 const stripe = i % 2 === 1 ? "#f8fafc" : "var(--card)";
                 return (
                   <tr
@@ -364,8 +368,8 @@ export default function VisitorsTable({
               </tr>
               {showPercentageRow && (() => {
                 const pctRowTotal = aggregation === "avg"
-                  ? aggregate(Object.values(siteTotals))
-                  : Object.values(siteTotals).reduce((a, b) => a + b, 0);
+                  ? aggregate(totalValues)
+                  : totalValues.reduce((a, b) => a + b, 0);
                 const pct = (v: number) =>
                   pctRowTotal > 0 ? (v / pctRowTotal) * 100 : 0;
                 return (
