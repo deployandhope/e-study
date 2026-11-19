@@ -31,6 +31,12 @@ export default async function Page() {
     { short: "RD", name: "Rekendiploma", color: "#8b5cf6" },
   ];
 
+  // TimesTablesTrainer heeft nog geen AdSense, wel GA4.
+  const GA4_SITES = [
+    ...ADSENSE_SITES,
+    { short: "TTT", name: "TimesTablesTrainer", color: "#16a34a" },
+  ];
+
   const siteNames = PROPERTIES.map((p) => p.name);
   const siteShorts = PROPERTIES.map((p) => p.short);
 
@@ -67,6 +73,7 @@ export default async function Page() {
           subtitle="totalUsers per dag · afgelopen 6 maanden"
           data={dailyUsers}
           xInterval={13}
+          sites={GA4_SITES}
         />
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4">

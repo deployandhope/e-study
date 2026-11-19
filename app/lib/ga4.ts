@@ -16,6 +16,7 @@ export const PROPERTIES = [
   { id: "530166190", name: "MijnTafeldiploma", short: "MTD" },
   { id: "371057702", name: "MathWordProblems", short: "MWP" },
   { id: "556034694", name: "Rekendiploma", short: "RD" },
+  { id: "538361242", name: "TimesTablesTrainer", short: "TTT" },
 ];
 
 async function getAccessToken(): Promise<string> {
