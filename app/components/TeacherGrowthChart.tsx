@@ -31,6 +31,14 @@ interface Props {
 const PRIMARY = "#2563eb";
 const FACEBOOK = "#f59e0b";
 
+// Per dag: één gestapelde balk. Meta kan op een dag meer registraties toewijzen dan
+// de site er telt (attributie op conversiedatum); het Facebook-deel van de balk is
+// daarom nooit hoger dan het werkelijke aantal van die dag.
+function splitDaily(row: Row) {
+  const viaFacebook = Math.min(row.facebook ?? 0, row.daily);
+  return { ...row, viaFacebook, notFacebook: row.daily - viaFacebook };
+}
+
 function formatDate(d: string) {
   const [y, m, day] = d.split("-");
   return new Date(`${y}-${m}-${day}`).toLocaleDateString("nl-NL", {
@@ -79,6 +87,14 @@ function CustomTooltip({
           {(mode === "cumulative" ? row.cumulative : row.daily).toLocaleString("nl-NL")}
         </span>
       </div>
+      {showFacebook && mode === "daily" && (
+        <div style={{ color: "#93c5fd" }}>
+          Niet via Facebook:{" "}
+          <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
+            {Math.max(0, row.daily - (row.facebook ?? 0)).toLocaleString("nl-NL")}
+          </span>
+        </div>
+      )}
       {showFacebook && (
         <div style={{ color: FACEBOOK }}>
           Via Facebook:{" "}
@@ -93,6 +109,8 @@ function CustomTooltip({
 
 export default function TeacherGrowthChart({ title, subtitle, data, showFacebook = false }: Props) {
   const [mode, setMode] = useState<"cumulative" | "daily">("cumulative");
+  const stacked = mode === "daily" && showFacebook;
+  const dailyData = showFacebook ? data.map(splitDaily) : data;
 
   return (
     <div className="flex flex-col gap-2">
@@ -109,7 +127,7 @@ export default function TeacherGrowthChart({ title, subtitle, data, showFacebook
         {showFacebook && (
           <div className="flex items-center gap-3 text-xs" style={{ color: "var(--muted)" }}>
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full" style={{ background: PRIMARY }} /> Alle registraties
+              <span className="inline-block w-2 h-2 rounded-full" style={{ background: PRIMARY }} /> {stacked ? "Niet via Facebook" : "Alle registraties"}
             </span>
             <span className="flex items-center gap-1">
               <span className="inline-block w-2 h-2 rounded-full" style={{ background: FACEBOOK }} /> Via Facebook
@@ -193,7 +211,7 @@ export default function TeacherGrowthChart({ title, subtitle, data, showFacebook
               )}
             </LineChart>
           ) : (
-            <BarChart data={data} margin={{ top: 4, right: 8, bottom: 30, left: 0 }}>
+            <BarChart data={dailyData} margin={{ top: 4, right: 8, bottom: 30, left: 0 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey="date"
@@ -212,8 +230,8 @@ export default function TeacherGrowthChart({ title, subtitle, data, showFacebook
                 width={42}
               />
               <Tooltip content={<CustomTooltip mode={mode} showFacebook={showFacebook} />} cursor={{ fill: "rgba(26,39,68,0.06)" }} />
-              <Bar dataKey="daily" fill={PRIMARY} isAnimationActive={false} />
-              {showFacebook && <Bar dataKey="facebook" fill={FACEBOOK} isAnimationActive={false} />}
+              {showFacebook && <Bar dataKey="viaFacebook" stackId="dag" fill={FACEBOOK} isAnimationActive={false} />}
+              <Bar dataKey={showFacebook ? "notFacebook" : "daily"} stackId="dag" fill={PRIMARY} isAnimationActive={false} />
             </BarChart>
           )}
         </ResponsiveContainer>
